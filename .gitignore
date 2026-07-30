@@ -1,0 +1,7 @@
+# Ignore localstack files
+/localstack
+
+# Ignore Terraform state files
+infra.tf
+infra.tfstate
+infra.tfstate.backup
