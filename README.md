@@ -80,7 +80,12 @@ Nota: si cambias valores en `.env`, recrea contenedores para aplicar los cambios
 
 ## Flujo CI/CD en GitHub Actions
 
-Workflow principal:
+Hay dos workflows separados:
+
+- `.github/workflows/terraform-localstack.yml` para el flujo final y limpio que se usará en PR a master.
+- `.github/workflows/terraform-localstack-debug.yml` para pruebas paso a paso en la rama de trabajo.
+
+### Workflow principal
 
 - `.github/workflows/terraform-localstack.yml`
 
@@ -89,6 +94,12 @@ Este workflow:
 - descarga el artifact `sqs-consumer-zip` desde backend
 - valida secrets/vars requeridos
 - ejecuta `terraform plan` y opcionalmente `terraform apply`
+
+### Workflow de depuracion
+
+- `.github/workflows/terraform-localstack-debug.yml`
+
+Este workflow sirve para aprender y depurar por etapas con `debug_until` sin tocar el YAML principal.
 
 ### Secrets requeridos
 
