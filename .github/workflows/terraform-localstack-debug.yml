@@ -53,7 +53,9 @@ jobs:
 
     services:
       localstack:
-        image: localstack/localstack:latest
+        image: localstack/localstack:2026.08.0
+        # ERROR 1
+        # image: localstack/localstack:latest
         ports:
           - 4566:4566
         env:
