@@ -5,3 +5,6 @@
 infra.tf
 infra.tfstate
 infra.tfstate.backup
+
+# Local environment secrets (keep .env.example versioned)
+.env
