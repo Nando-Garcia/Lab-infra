@@ -2,7 +2,8 @@ version: "3.8"
 
 services:
   localstack-lab:
-    image: localstack/localstack:latest
+    #image: localstack/localstack:latest, error de copatibilidad con runner de actions
+    image: localstack/localstack:4.14.1
     container_name: localstack-lab
     ports:
       - "4566:4566"   # Gateway principal
