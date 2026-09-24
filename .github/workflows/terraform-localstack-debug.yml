@@ -55,7 +55,7 @@ jobs:
       localstack:
         # Error 1 - peticion de token de autenticacion, error de compatibilidad con runner de actions
         # image: localstack/localstack:latest
-        image: localstack/localstack:4.14.1
+        image: localstack/localstack:3.0.0
         ports:
           - 4566:4566
         env:
