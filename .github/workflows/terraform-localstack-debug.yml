@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # DEBUG_UNTIL - Se modifica este valor para ejecucion por pasos, solo para rama: config/github-actions-infra 
-      DEBUG_UNTIL: "1" 
+      DEBUG_UNTIL: "2" 
       TF_VAR_db_host: localhost
       TF_VAR_db_port: "5432"
       TF_VAR_db_name: ${{ secrets.DB_NAME }}
@@ -84,7 +84,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate required secrets
-        if: ${{ github.event.inputs.debug_until >= '2' }}
+        if: ${{ env.DEBUG_UNTIL >= '2' }}
+        # if: ${{ github.event.inputs.debug_until >= '2' }}
         env:
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
