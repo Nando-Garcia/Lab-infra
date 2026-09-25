@@ -133,15 +133,19 @@ jobs:
         if: ${{ env.DEBUG_UNTIL >= '7' }}
         # if: ${{ github.event.inputs.debug_until >= '7' }}
         run: |
-          for i in {1..30}; do
-            if curl -s http://localhost:4566/_localstack/health | grep -q '"running"'; then
+          for i in {1..45}; do
+            HEALTH_JSON="$(curl -sS --max-time 3 http://localhost:4566/_localstack/health || true)"
+            if [ -n "$HEALTH_JSON" ] && echo "$HEALTH_JSON" | grep -Eq '"(initialized|available|running)"'; then
               echo "LocalStack is ready"
+              echo "$HEALTH_JSON"
               exit 0
             fi
-            echo "Waiting for LocalStack..."
+            echo "Waiting for LocalStack... attempt $i/45"
             sleep 2
           done
           echo "LocalStack did not become ready in time"
+          echo "Last health response:"
+          curl -sS --max-time 5 http://localhost:4566/_localstack/health || true
           exit 1
 
       - name: Resolve lambda architecture
