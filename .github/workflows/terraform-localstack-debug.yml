@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # DEBUG_UNTIL - Se modifica este valor para ejecucion por pasos, solo para rama: config/github-actions-infra 
-      DEBUG_UNTIL: "5" 
+      DEBUG_UNTIL: "6"
       TF_VAR_db_host: localhost
       TF_VAR_db_port: "5432"
       TF_VAR_db_name: ${{ secrets.DB_NAME }}
@@ -125,7 +125,8 @@ jobs:
           test -f backend-artifacts/sqs-consumer.zip
 
       - name: Setup Terraform
-        if: ${{ github.event.inputs.debug_until >= '6' }}
+        if: ${{ env.DEBUG_UNTIL >= '6' }}
+        # if: ${{ github.event.inputs.debug_until >= '6' }}
         uses: hashicorp/setup-terraform@v3
 
       - name: Wait for LocalStack readiness
