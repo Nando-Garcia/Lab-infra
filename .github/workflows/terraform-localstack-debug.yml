@@ -42,9 +42,11 @@ on:
       - config/github-actions-infra
 
 jobs:
-  terraform:
+  build-infra:
     runs-on: ubuntu-latest
     env:
+      # DEBUG_UNTIL - Se modifica este valor para ejecucion por pasos, solo para rama: config/github-actions-infra 
+      DEBUG_UNTIL: "1" 
       TF_VAR_db_host: localhost
       TF_VAR_db_port: "5432"
       TF_VAR_db_name: ${{ secrets.DB_NAME }}
@@ -77,7 +79,8 @@ jobs:
 
     steps:
       - name: Checkout infra repository
-        if: ${{ github.event.inputs.debug_until >= '1' }}
+        if: ${{ env.DEBUG_UNTIL >= '1' }}
+        # if: ${{ github.event.inputs.debug_until >= '1' }}
         uses: actions/checkout@v4
 
       - name: Validate required secrets
