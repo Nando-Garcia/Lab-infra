@@ -59,11 +59,12 @@ jobs:
         # image: localstack/localstack:latest
         image: localstack/localstack:3.0.0
         ports:
+        # Error 2 - Lambda no tiene acceso a docker engine de localstack
           - 4566:4566
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
         env:
           SERVICES: s3,sqs,lambda,iam,logs,secretsmanager,cloudwatch
-          LAMBDA_RUNTIME_EXECUTOR: local
-          LAMBDA_EXECUTOR: local
           DEBUG: 1
 
       postgres:
