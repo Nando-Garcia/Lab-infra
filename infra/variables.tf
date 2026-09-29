@@ -45,14 +45,12 @@ variable "db_name" {
 variable "db_username" {
   description = "PostgreSQL username"
   type        = string
-  default     = "admin"
 }
 
 variable "db_password" {
   description = "PostgreSQL password"
   type        = string
   sensitive   = true
-  default     = "admin123"
 }
 
 # ─── Lambda ───────────────────────────────────────────────────────────────────
