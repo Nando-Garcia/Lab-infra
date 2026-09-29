@@ -40,6 +40,8 @@ jobs:
           - 4566:4566
         env:
           SERVICES: s3,sqs,lambda,iam,logs,secretsmanager,cloudwatch
+          LAMBDA_RUNTIME_EXECUTOR: local
+          LAMBDA_EXECUTOR: local
           DEBUG: 1
 
       postgres:
