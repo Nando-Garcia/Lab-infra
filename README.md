@@ -7,6 +7,7 @@ Este repositorio concentra la infraestructura (Terraform + LocalStack + PostgreS
 - Docker Desktop activo
 - Terraform (en ARM64 puedes usar WSL/Ubuntu)
 - Acceso a GitHub Actions del repo de infra
+- LocalStack para desarrollo local y para CI en workflows se usa v3 (estable)
 
 Verificacion rapida desde PowerShell:
 
@@ -85,6 +86,14 @@ Hay dos workflows separados:
 - `.github/workflows/terraform-localstack.yml` para el flujo final y limpio que se usará en PR a master.
 - `.github/workflows/terraform-localstack-debug.yml` para pruebas paso a paso en la rama de trabajo.
 
+Adicionalmente, el flujo de infra depende de un artifact ZIP generado en el repo backend por el workflow `build-lambda-artifact.yml`.
+
+Importante sobre artifact:
+
+- Nombre esperado del artifact: `sqs-consumer-zip`
+- Retencion configurada en backend: 7 dias
+- Si el artifact expira, debes volver a ejecutar el workflow del backend para regenerarlo antes de lanzar el workflow de infra.
+
 ### Workflow principal
 
 - `.github/workflows/terraform-localstack.yml`
@@ -94,12 +103,23 @@ Este workflow:
 - descarga el artifact `sqs-consumer-zip` desde backend
 - valida secrets/vars requeridos
 - ejecuta `terraform plan` y opcionalmente `terraform apply`
+- usa LocalStack v3 (`localstack/localstack:3.0.0`)
 
 ### Workflow de depuracion
 
 - `.github/workflows/terraform-localstack-debug.yml`
 
-Este workflow sirve para aprender y depurar por etapas con `debug_until` sin tocar el YAML principal.
+Este workflow sirve para aprender y depurar por etapas sin tocar el YAML principal.
+
+En el estado actual, para pruebas por push se controla con variables de entorno dentro del job:
+
+- `DEBUG_UNTIL` para habilitar pasos por etapa
+- `APPLY` para habilitar o bloquear `terraform apply`
+
+Este workflow tambien usa LocalStack v3 y monta Docker socket para habilitar creacion/ejecucion de Lambda en runner:
+
+- `image: localstack/localstack:3.0.0`
+- volumen: `/var/run/docker.sock:/var/run/docker.sock`
 
 ### Secrets requeridos
 
@@ -112,9 +132,9 @@ Este workflow sirve para aprender y depurar por etapas con `debug_until` sin toc
 
 - `BACKEND_REPOSITORY` con formato `owner/repo`
 
-## Debug paso a paso con debug_until
+## Debug paso a paso
 
-El workflow tiene input `debug_until` para ejecutar por etapas sin editar YAML.
+En el workflow debug, el avance por etapas se hace con `DEBUG_UNTIL`.
 
 - `1`: checkout
 - `2`: validacion de secrets
@@ -128,17 +148,17 @@ El workflow tiene input `debug_until` para ejecutar por etapas sin editar YAML.
 
 Uso recomendado para depurar:
 
-1. Ejecuta con `debug_until=3`
-2. Ejecuta con `debug_until=5`
-3. Ejecuta con `debug_until=7`
-4. Ejecuta con `debug_until=9` y `apply=false`
-5. Ejecuta con `debug_until=9` y `apply=true`
+1. Push con `DEBUG_UNTIL="3"`
+2. Push con `DEBUG_UNTIL="5"`
+3. Push con `DEBUG_UNTIL="7"`
+4. Push con `DEBUG_UNTIL="9"` y `APPLY="false"`
+5. Push con `DEBUG_UNTIL="9"` y `APPLY="true"`
 
-## Por que hay dos .gitignore
+## Dos .gitignore
 
-Se deben mantener ambos:
+Mantener ambos:
 
 - `.gitignore` (raiz): reglas globales del repo (por ejemplo `.env`, `localstack/`).
 - `infra/.gitignore`: reglas de Terraform (por ejemplo `terraform.tfvars`, `*.auto.tfvars`, state y cache).
 
-Esta separacion reduce riesgo de fuga de secretos y evita ruido en commits.
+Ideal para reducir riesgo de fuga de secretos y mas organización en commits.

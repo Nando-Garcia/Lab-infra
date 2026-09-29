@@ -45,7 +45,8 @@ jobs:
   build-infra:
     runs-on: ubuntu-latest
     env:
-      # DEBUG_UNTIL: "9" - Se modifica este valor para ejecucion por pasos, solo para rama: config/github-actions-infra 
+      # DEBUG_UNTIL: "9" # Se modifica este valor para ejecucion por pasos, solo para rama: config/github-actions-infra 
+      # APPLY: "true"
       TF_VAR_db_host: localhost
       TF_VAR_db_port: "5432"
       TF_VAR_db_name: ${{ secrets.DB_NAME }}
@@ -59,6 +60,9 @@ jobs:
         image: localstack/localstack:3.0.0
         ports:
           - 4566:4566
+        # Error 2 - Lambda no tiene acceso a docker engine de localstack, se agrega volumen para compartir docker.sock
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
         env:
           SERVICES: s3,sqs,lambda,iam,logs,secretsmanager,cloudwatch
           DEBUG: 1
@@ -183,7 +187,7 @@ jobs:
 
       - name: Terraform apply
         if: ${{ github.event.inputs.debug_until >= '9' && github.event.inputs.apply == 'true' }}
-        # if: ${{ env.DEBUG_UNTIL >= '9' && github.event.inputs.apply == 'true' }}
+        # if: ${{ env.DEBUG_UNTIL >= '9' && env.APPLY == 'true' }}
         working-directory: infra
         run: |
           terraform apply -auto-approve \
